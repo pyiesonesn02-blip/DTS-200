@@ -1,5 +1,5 @@
 name: student_phonebook
-description: "DTS-200 Phonebook Application"
+description: "A new Flutter project."
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -10,29 +10,23 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  csv: ^8.0.0
-  url_launcher: ^6.3.2
   cupertino_icons: ^1.0.8
-  excel: ^4.0.6
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
-
-flutter:
-  uses-material-design: true
-
-  assets:
-    - assets/student.json
-    - assets/images/
-    dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_launcher_icons: "^0.13.1"
+  flutter_launcher_icons: ^0.13.1
 
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/app_logo.png"
   min_sdk_android: 21
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/app_logo.png
+    - assets/student.json
