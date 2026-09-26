@@ -94,7 +94,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                     const Icon(Icons.security, color: Colors.amber)),
             const SizedBox(width: 10),
             const Text(
-              'စုံထောက်အရာရှိသင်တန်း (၂၀၀)',
+              'DTS-200',
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -128,7 +128,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                   onChanged: _filterStudents,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    hintText: 'အမည် / ကသသအမှတ် / ဖုန်း / အဆင့် ဖြင့် ရှာ...',
+                    hintText: 'အမည် / ကသအမှတ် / ဖုန်း / အဆင့် ဖြင့် ရှာ...',
                     hintStyle: TextStyle(color: Colors.grey.shade400),
                     prefixIcon: const Icon(Icons.search, color: Colors.amber),
                     filled: true,
@@ -353,7 +353,7 @@ class StudentDetailScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    _buildDetailRow(Icons.badge, 'ကသသအမှတ်', kathaNo),
+                    _buildDetailRow(Icons.badge, 'ကသအမှတ်', kathaNo),
                     const Divider(color: Colors.white12),
                     _buildDetailRow(Icons.work, 'တာဝန်', duty),
                     const Divider(color: Colors.white12),
