@@ -64,11 +64,14 @@ class _StudentListScreenState extends State<StudentListScreen> {
           final rank = student['rank']?.toString().toLowerCase() ?? '';
           final serial =
               student['serial_number']?.toString().toLowerCase() ?? '';
+          final kathaNo = student['katha_no']?.toString().toLowerCase() ?? '';
           final phone = student['phone']?.toString().toLowerCase() ?? '';
           final searchLower = query.toLowerCase();
+
           return name.contains(searchLower) ||
               rank.contains(searchLower) ||
               serial.contains(searchLower) ||
+              kathaNo.contains(searchLower) ||
               phone.contains(searchLower);
         }).toList();
       }
@@ -94,7 +97,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                     const Icon(Icons.security, color: Colors.amber)),
             const SizedBox(width: 10),
             const Text(
-              'DTS-200',
+              'စုံထောက်အရာရှိသင်တန်း (၂၀၀)',
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -128,7 +131,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                   onChanged: _filterStudents,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    hintText: 'အမည် / ကသအမှတ် / ဖုန်း / အဆင့် ဖြင့် ရှာ...',
+                    hintText: 'အမည် / ကသသအမှတ် / ဖုန်း / အဆင့် ဖြင့် ရှာ...',
                     hintStyle: TextStyle(color: Colors.grey.shade400),
                     prefixIcon: const Icon(Icons.search, color: Colors.amber),
                     filled: true,
@@ -178,7 +181,6 @@ class _StudentListScreenState extends State<StudentListScreen> {
                             ),
                             child: ListTile(
                               contentPadding: const EdgeInsets.all(10),
-                              // ဓာတ်ပုံ သို့မဟုတ် နံပါတ် အဝိုင်း
                               leading: CircleAvatar(
                                 radius: 26,
                                 backgroundColor:
@@ -195,7 +197,6 @@ class _StudentListScreenState extends State<StudentListScreen> {
                                       )
                                     : null,
                               ),
-                              // အမည်နှင့် ရာထူး
                               title: Text(
                                 '${student['id'] ?? index + 1}. ${student['name'] ?? ''} (${student['rank'] ?? ''})',
                                 style: const TextStyle(
@@ -204,7 +205,6 @@ class _StudentListScreenState extends State<StudentListScreen> {
                                   color: Colors.amber,
                                 ),
                               ),
-                              // တာဝန်နှင့် လိပ်စာ အတိုချုပ်
                               subtitle: Padding(
                                 padding: const EdgeInsets.only(top: 4.0),
                                 child: Column(
@@ -225,7 +225,6 @@ class _StudentListScreenState extends State<StudentListScreen> {
                                   ],
                                 ),
                               ),
-                              // နှိပ်လိုက်ပါက ထိုသူတစ်ဦးချင်းစီ၏ စာမျက်နှာသို့ ရောက်သွားမည်
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -292,7 +291,6 @@ class StudentDetailScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 20),
-            // ကြီးမားသော ပုံ Profile ဓာတ်ပုံ
             Center(
               child: Container(
                 decoration: BoxDecoration(
@@ -324,8 +322,6 @@ class StudentDetailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-
-            // အမည်နှင့် ရာထူး
             Text(
               name,
               style: const TextStyle(
@@ -341,8 +337,6 @@ class StudentDetailScreen extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-
-            // အချက်အလက်အသေးစိတ် Card
             Card(
               color: const Color(0xFF1E293B),
               shape: RoundedRectangleBorder(
@@ -353,7 +347,7 @@ class StudentDetailScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    _buildDetailRow(Icons.badge, 'ကသအမှတ်', kathaNo),
+                    _buildDetailRow(Icons.badge, 'ကသသအမှတ်', kathaNo),
                     const Divider(color: Colors.white12),
                     _buildDetailRow(Icons.work, 'တာဝန်', duty),
                     const Divider(color: Colors.white12),
@@ -367,8 +361,6 @@ class StudentDetailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 30),
-
-            // ဖုန်းခေါ်ဆိုရန် ခလုတ်ကြီး
             if (phone != 'ဖုန်းနံပါတ် မရှိပါ' && phone.isNotEmpty)
               SizedBox(
                 width: double.infinity,
