@@ -59,30 +59,44 @@ class _StudentListScreenState extends State<StudentListScreen> {
       if (query.isEmpty) {
         _filteredStudents = _allStudents;
       } else {
+        final searchLower = query.toLowerCase().trim();
         _filteredStudents = _allStudents.where((student) {
           final name = student['name']?.toString().toLowerCase() ?? '';
-          final rank = student['rank']?.toString().toLowerCase() ?? '';
           final serial =
               student['serial_number']?.toString().toLowerCase() ?? '';
           final kathaNo = student['katha_no']?.toString().toLowerCase() ?? '';
           final phone = student['phone']?.toString().toLowerCase() ?? '';
-          final searchLower = query.toLowerCase();
 
-          return name.contains(searchLower) ||
-              rank.contains(searchLower) ||
-              serial.contains(searchLower) ||
-              kathaNo.contains(searchLower) ||
-              phone.contains(searchLower);
+          if (kathaNo == searchLower || serial == searchLower) {
+            return true;
+          }
+          if (phone == searchLower) {
+            return true;
+          }
+          if (name.contains(searchLower)) {
+            return true;
+          }
+
+          return false;
         }).toList();
       }
     });
   }
 
-  Future<void> _makePhoneCall(String phoneNumber) async {
-    final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
-    if (await canLaunchUrl(launchUri)) {
-      await launchUrl(launchUri);
+  String _getImagePath(dynamic studentImage) {
+    String img = studentImage?.toString().trim() ?? '';
+    if (img.isEmpty) return '';
+
+    if (img.startsWith('images/')) {
+      img = img.replaceFirst('images/', '');
     }
+    if (img.startsWith('assets/images/')) {
+      img = img.replaceFirst('assets/images/', '');
+    } else if (img.startsWith('assets/')) {
+      img = img.replaceFirst('assets/', '');
+    }
+
+    return 'assets/images/$img';
   }
 
   @override
@@ -91,7 +105,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            Image.asset('assets/app_logo.png',
+            Image.asset('assets/images/app_logo.png',
                 height: 32,
                 errorBuilder: (c, o, s) =>
                     const Icon(Icons.security, color: Colors.amber)),
@@ -108,14 +122,13 @@ class _StudentListScreenState extends State<StudentListScreen> {
       ),
       body: Stack(
         children: [
-          // Watermark Background Logo
-          Center(
+          // Home Screen နောက်ခံရေစာပုံ (မျက်နှာပြင်အပြည့်)
+          Positioned.fill(
             child: Opacity(
-              opacity: 0.08,
+              opacity: 0.15,
               child: Image.asset(
-                'assets/app_logo.png',
-                width: 280,
-                fit: BoxFit.contain,
+                'assets/images/watermark.png',
+                fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) => const SizedBox(),
               ),
             ),
@@ -131,7 +144,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                   onChanged: _filterStudents,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    hintText: 'အမည် / ကသသအမှတ် / ဖုန်း / အဆင့် ဖြင့် ရှာ...',
+                    hintText: 'အမည် / ကသသအမှတ် / ဖုန်း ဖြင့် ရှာ...',
                     hintStyle: TextStyle(color: Colors.grey.shade400),
                     prefixIcon: const Icon(Icons.search, color: Colors.amber),
                     filled: true,
@@ -159,7 +172,8 @@ class _StudentListScreenState extends State<StudentListScreen> {
                         itemCount: _filteredStudents.length,
                         itemBuilder: (context, index) {
                           final student = _filteredStudents[index];
-                          final String imagePath = student['image'] ?? '';
+                          final String imagePath =
+                              _getImagePath(student['image']);
                           final String phone =
                               student['phone'] ?? 'ဖုန်းနံပါတ် မရှိပါ';
                           final String duty = student['dudy'] ??
@@ -198,7 +212,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                                     : null,
                               ),
                               title: Text(
-                                '${student['id'] ?? index + 1}. ${student['name'] ?? ''} (${student['rank'] ?? ''})',
+                                '${student['id'] ?? index + 1}. ${student['name'] ?? ''}',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -248,7 +262,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
 }
 
 // ==========================================
-// လူတစ်ယောက်ချင်းစီအတွက် သီးသန့်ပေါ်မည့် Detail Screen
+// လူတစ်ယောက်ချင်းစီအတွက် သီးသန့်ပေါ်မည့် Detail Screen (ရဲအုပ် ဖြုတ်ထားသည်)
 // ==========================================
 class StudentDetailScreen extends StatelessWidget {
   final dynamic student;
@@ -259,9 +273,22 @@ class StudentDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String imagePath = student['image'] ?? '';
+    String getImagePath(dynamic studentImage) {
+      String img = studentImage?.toString().trim() ?? '';
+      if (img.isEmpty) return '';
+      if (img.startsWith('images/')) {
+        img = img.replaceFirst('images/', '');
+      }
+      if (img.startsWith('assets/images/')) {
+        img = img.replaceFirst('assets/images/', '');
+      } else if (img.startsWith('assets/')) {
+        img = img.replaceFirst('assets/', '');
+      }
+      return 'assets/images/$img';
+    }
+
+    final String imagePath = getImagePath(student['image']);
     final String name = student['name'] ?? 'အမည်မသိ';
-    final String rank = student['rank'] ?? '';
     final String phone = student['phone'] ?? 'ဖုန်းနံပါတ် မရှိပါ';
     final String duty = student['dudy'] ??
         student['duty'] ??
@@ -285,106 +312,119 @@ class StudentDetailScreen extends StatelessWidget {
         title: Text('$name ၏ အချက်အလက်',
             style: const TextStyle(color: Colors.amber, fontSize: 18)),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 20),
-            Center(
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.amber, width: 3),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.amber.withOpacity(0.2),
-                      blurRadius: 10,
-                      spreadRadius: 2,
+      body: Stack(
+        children: [
+          // Profile နောက်ခံရေစာပုံ (မျက်နှာပြင်အပြည့်နှင့် ပုံအကြီးပြရန်)
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.15,
+              child: Image.asset(
+                'assets/images/watermark.png',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => const SizedBox(),
+              ),
+            ),
+          ),
+
+          // ပင်မအချက်အလက်များ
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
+                Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.amber, width: 3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.amber.withOpacity(0.2),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: CircleAvatar(
-                  radius: 70,
-                  backgroundColor: Colors.amber.shade900.withOpacity(0.4),
-                  backgroundImage:
-                      imagePath.isNotEmpty ? AssetImage(imagePath) : null,
-                  child: imagePath.isEmpty
-                      ? Text(
-                          kathaNo,
-                          style: const TextStyle(
-                              fontSize: 32,
-                              color: Colors.amber,
-                              fontWeight: FontWeight.bold),
-                        )
-                      : null,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              name,
-              style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.amber),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              rank,
-              style: const TextStyle(fontSize: 16, color: Colors.white70),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            Card(
-              color: const Color(0xFF1E293B),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-                side: BorderSide(color: Colors.amber.withOpacity(0.4)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    _buildDetailRow(Icons.badge, 'ကသသအမှတ်', kathaNo),
-                    const Divider(color: Colors.white12),
-                    _buildDetailRow(Icons.work, 'တာဝန်', duty),
-                    const Divider(color: Colors.white12),
-                    _buildDetailRow(Icons.location_on, 'လိပ်စာ', address),
-                    const Divider(color: Colors.white12),
-                    _buildDetailRow(Icons.school, 'သင်တန်းအမှတ်စဉ်', course),
-                    const Divider(color: Colors.white12),
-                    _buildDetailRow(Icons.phone, 'ဖုန်းနံပါတ်', phone),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 30),
-            if (phone != 'ဖုန်းနံပါတ် မရှိပါ' && phone.isNotEmpty)
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: () => makePhoneCall(phone),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal.shade700,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    child: CircleAvatar(
+                      radius: 70,
+                      backgroundColor: Colors.amber.shade900.withOpacity(0.4),
+                      backgroundImage:
+                          imagePath.isNotEmpty ? AssetImage(imagePath) : null,
+                      child: imagePath.isEmpty
+                          ? Text(
+                              kathaNo,
+                              style: const TextStyle(
+                                  fontSize: 32,
+                                  color: Colors.amber,
+                                  fontWeight: FontWeight.bold),
+                            )
+                          : null,
                     ),
                   ),
-                  icon: const Icon(Icons.phone_in_talk, color: Colors.white),
-                  label: const Text(
-                    'ဖုန်းခေါ်ဆိုမည်',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  name,
+                  style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                Card(
+                  color: const Color(0xFF1E293B).withOpacity(0.80),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    side: BorderSide(color: Colors.amber.withOpacity(0.4)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        _buildDetailRow(Icons.badge, 'ကသသအမှတ်', kathaNo),
+                        const Divider(color: Colors.white12),
+                        _buildDetailRow(Icons.work, 'တာဝန်', duty),
+                        const Divider(color: Colors.white12),
+                        _buildDetailRow(Icons.location_on, 'လိပ်စာ', address),
+                        const Divider(color: Colors.white12),
+                        _buildDetailRow(
+                            Icons.school, 'သင်တန်းအမှတ်စဉ်', course),
+                        const Divider(color: Colors.white12),
+                        _buildDetailRow(Icons.phone, 'ဖုန်းနံပါတ်', phone),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-          ],
-        ),
+                const SizedBox(height: 30),
+                if (phone != 'ဖုန်းနံပါတ် မရှိပါ' && phone.isNotEmpty)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      onPressed: () => makePhoneCall(phone),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal.shade700,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon:
+                          const Icon(Icons.phone_in_talk, color: Colors.white),
+                      label: const Text(
+                        'ဖုန်းခေါ်ဆိုမည်',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
